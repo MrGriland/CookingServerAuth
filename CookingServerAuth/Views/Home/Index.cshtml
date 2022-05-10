@@ -1,0 +1,86 @@
+﻿@{
+    ViewBag.Title = "Рецепты";
+}
+<style>
+    .border-primary {
+        border: 1px solid #007bff;
+    }
+</style>
+<div class="form-group">
+    <script>
+        function changelike(id) {
+            var button = document.getElementById(id);
+            switch (button.innerHTML) {
+                case "Нравится!":
+                    like(id, button);
+                    break;
+                case "Не нравится!":
+                    unlike(id, button);
+                    break;
+            }
+
+        }
+        function like(id, button) {
+            const params = {
+                id: id,
+            }
+            var xhr = new XMLHttpRequest();
+            var url = new URL("http://"+"@HttpContext.Current.Request.Url.Authority/CookingServerAuth/api/favorite")
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 204) {
+                    button.innerHTML = "Не нравится!";
+                }
+            }
+            xhr.send(JSON.stringify(params));
+        }
+        function unlike(id, button) {
+            const params = {
+                id: id,
+            }
+            var xhr = new XMLHttpRequest();
+            var url = new URL("http://"+"@HttpContext.Current.Request.Url.Authority/CookingServerAuth/api/favorite")
+            xhr.open("DELETE", url, true);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 204) {
+                    button.innerHTML = "Нравится!";
+                }
+            }
+            xhr.send(JSON.stringify(params));
+        }
+    </script>
+    <div class="jumbotron">
+        <h1>@ViewBag.Title</h1>
+        @if (User.Identity.IsAuthenticated)
+        {
+            @Html.ActionLink("Добавить", "Add", "Home")
+        }
+    </div>
+
+    @foreach (var recipe in ViewBag.Recipes)
+    {
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">@recipe.Title</h3>
+                @if (User.Identity.IsAuthenticated)
+                {
+            <div class="btn-group pull-right">
+                @if (!recipe.isFavorite)
+                {
+                    <button class="btn btn-default btn-sm" id="@recipe.Id" onclick="changelike(this.id)">Нравится!</button>
+                }
+                else
+                {
+                    <button class="btn btn-default btn-sm" id="@recipe.Id" onclick="changelike(this.id)">Не нравится!</button>
+                }
+            </div>
+                }
+            </div>
+            <div class="panel-body">
+                @recipe.Description
+            </div>
+        </div>
+    }
+</div>

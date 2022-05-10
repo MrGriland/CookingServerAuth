@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "Админ-панель";
+}
+<script>
+    function removerecipe(id) {
+        const params = {
+            id: id,
+        }
+        let isdelete = confirm("Вы уверены?");
+        if (isdelete) {
+            var xhr = new XMLHttpRequest();
+            var url = new URL("http://"+"@HttpContext.Current.Request.Url.Authority/CookingServerAuth/api/recipes")
+            xhr.open("DELETE", url, true);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 204) {
+                    var tr = document.getElementById(id + "$tr");
+                    tr.parentNode.removeChild(tr);
+                }
+            }
+            xhr.send(JSON.stringify(params));
+        }
+    }
+</script>
+<div class="form-group">
+    <br/>
+    <table class="form-group">
+        <tr class="tr">
+            <td scope="col"><form method="get" action="~/Home/Edit"><input class=" btn btn-success" type="submit" id="editb" disabled="disabled" value="Изменить" /><input type="hidden" id="idSelectedItem" name="idSelectedItem" value="" /></form></td>
+            <td scope="col"><input type="submit" class=" btn btn-danger" name="delSelectedItem" value="Удалить" onclick="removerecipe(this.id)"/></td>
+        </tr>
+    </table>
+    <table class="table" border="1">
+        <tr class="tr">
+            <td scope="col">Выбрать</td>
+            <td scope="col">Id</td>
+            <td scope="col">Название</td>
+            <td scope="col">Описание</td>
+            <td scope="col">Время последнего изменения</td>
+        </tr>
+        @foreach (var item in ViewBag.Recipes)
+        {
+            <tr id="@item.Id$tr" class="tr">
+                <td scope="row"><input class="form-control" type="radio" name="a" id="@item.Id" onchange="change()" /></td>
+                <td scope="row">@item.Id</td>
+                <td scope="row">@item.Title</td>
+                <td scope="row">@item.Description</td>
+                <td scope="row">@item.Date</td>
+            </tr>
+        }
+    </table>
+    <script>function change() {
+            let elem = document.getElementsByName('a')
+            let update = document.getElementsByName('idSelectedItem')
+            document.getElementById('editb').disabled = false;
+            let del = document.getElementsByName('delSelectedItem')
+            elem.forEach(item => {
+                if (item.checked) {
+                    update[0].value = item.id;
+                    del[0].id = item.id;
+                }
+            })
+        }</script>
+</div>

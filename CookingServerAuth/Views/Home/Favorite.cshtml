@@ -1,0 +1,71 @@
+﻿
+@{
+    ViewBag.Title = "Избранные";
+}
+
+<div class="form-group">
+    <script>
+        function changelike(id) {
+            var button = document.getElementById(id);
+            switch (button.innerHTML) {
+                case "Нравится!":
+                    like(id, button);
+                    break;
+                case "Не нравится!":
+                    unlike(id, button);
+                    break;
+            }
+
+        }
+        function like(id, button) {
+            const params = {
+                id: id,
+            }
+            var xhr = new XMLHttpRequest();
+            var url = new URL("http://"+"@HttpContext.Current.Request.Url.Authority/CookingServerAuth/api/favorite")
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 204) {
+                    button.innerHTML = "Не нравится!";
+                }
+            }
+            xhr.send(JSON.stringify(params));
+        }
+        function unlike(id, button) {
+            const params = {
+                id: id,
+            }
+            var xhr = new XMLHttpRequest();
+            var url = new URL("http://"+"@HttpContext.Current.Request.Url.Authority/CookingServerAuth/api/favorite")
+            xhr.open("DELETE", url, true);
+            xhr.setRequestHeader("Content-type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 204) {
+                    button.innerHTML = "Нравится!";
+                    var div = document.getElementById(id + "$d");
+                    div.parentNode.removeChild(div);
+                }
+            }
+            xhr.send(JSON.stringify(params));
+        }
+    </script>
+    <div class="jumbotron">
+        <h2>Избранные</h2>
+    </div>
+
+    @foreach (var recipe in ViewBag.Recipes)
+    {
+        <div id="@recipe.Id$d" class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">@recipe.Title</h3>
+                <div class="btn-group pull-right">
+                    <button class="btn btn-default btn-sm" id="@recipe.Id" onclick="changelike(this.id)">Не нравится!</button>
+                </div>
+            </div>
+            <div class="panel-body">
+                @recipe.Description
+            </div>
+        </div>
+    }
+</div>
