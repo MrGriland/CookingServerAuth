@@ -114,12 +114,14 @@ namespace CookingServerAuth.Models
         }
         public void Delete(int id)
         {
-            string sqlExpression = "delete from RecipeInfo where RecipeInfo_ID = @id";
+            string sqlExpression = "update RecipeInfo set RecipeInfo_TimeStamp = @time, RecipeInfo_isDeleted = 1 where RecipeInfo_ID = @rid";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
                 SqlCommand command = new SqlCommand(sqlExpression, connection);
-                SqlParameter sqlParameter = new SqlParameter("@id", id);
+                SqlParameter sqlParameter = new SqlParameter("@time", DateTime.Now);
+                command.Parameters.Add(sqlParameter);
+                sqlParameter = new SqlParameter("@rid", id);
                 command.Parameters.Add(sqlParameter);
                 SqlDataReader reader = command.ExecuteReader();
                 reader.Close();
@@ -153,7 +155,7 @@ namespace CookingServerAuth.Models
 
         public void Edit(EditRecipe recipe)
         {
-            string sqlExpression = "update RecipeInfo set RecipeInfo_Title = @title, RecipeInfo_Description = @description where RecipeInfo_ID = @rid";
+            string sqlExpression = "update RecipeInfo set RecipeInfo_Title = @title, RecipeInfo_Description = @description, RecipeInfo_TimeStamp = @time where RecipeInfo_ID = @rid";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
@@ -161,6 +163,8 @@ namespace CookingServerAuth.Models
                 SqlParameter sqlParameter = new SqlParameter("@title", recipe.Title);
                 command.Parameters.Add(sqlParameter);
                 sqlParameter = new SqlParameter("@description", recipe.Description);
+                command.Parameters.Add(sqlParameter);
+                sqlParameter = new SqlParameter("@time", DateTime.Now);
                 command.Parameters.Add(sqlParameter);
                 sqlParameter = new SqlParameter("@rid", recipe.Id);
                 command.Parameters.Add(sqlParameter);

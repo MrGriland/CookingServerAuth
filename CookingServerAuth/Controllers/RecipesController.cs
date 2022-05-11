@@ -17,11 +17,11 @@ namespace CookingServerAuth.Controllers
         {
             return recipesContext.GetRecipesList();
         }
-        public InsertRecipe Post([FromBody] PostRecipe value)
+        public void Post([FromBody] PostRecipe value)
         {
             InsertRecipe insertRecipe = new InsertRecipe() { OwnerId = User.Identity.GetUserId(),
                 Title = value.Title, Description = value.Description, Date = DateTime.Now, Deleted = false};
-            return insertRecipe;
+            recipesContext.Add(insertRecipe);
         }
         public void Delete([FromBody] IDContainer value)
         {

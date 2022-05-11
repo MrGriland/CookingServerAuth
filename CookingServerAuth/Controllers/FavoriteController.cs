@@ -19,7 +19,8 @@ namespace CookingServerAuth.Controllers
         }
         public void Post([FromBody] IDContainer value)
         {
-            favoritesContext.AddFavorite(value.id, User.Identity.GetUserId());
+            if(!favoritesContext.IsFavorite(value.id, User.Identity.GetUserId()))
+                favoritesContext.AddFavorite(value.id, User.Identity.GetUserId());
         }
         public void Delete([FromBody] IDContainer value)
         {
